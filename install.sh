@@ -38,10 +38,10 @@ clone_repository() {
   local install_location="$2"
   local cwd=$(pwd)
   if [ ! -d "$2" ] ;then
-	  logn "Cloning git repository $1 into $install_location:"
+    logn "Cloning git repository $1 into $install_location:"
     git clone "$1" "$2"
   else
-	  logn "Updating git repository in $install_location:"
+    logn "Updating git repository in $install_location:"
     cd "$install_location"
     git pull origin master &> /dev/null
     cd "$cwd"
