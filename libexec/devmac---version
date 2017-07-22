@@ -23,3 +23,4 @@ echo -e "${BOLD}DevMac Version${ENDC}"
 echo "-------------------------------------"
 echo
 echo "v${git_revision:-$version}"
+echo

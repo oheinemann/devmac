@@ -15,6 +15,10 @@
 set -e
 [ -n "$DEVMAC_DEBUG" ] && set -x
 
+
+# ----------------------------  Main functions  --------------------------------
+
+
 command_path() {
   local command="$1"
   command -v devmac-"$command" || command -v devmac-sh-"$command" || true
@@ -132,21 +136,28 @@ print_usage() {
   [[ -z "$usage" ]] || echo "$usage"
 }
 
+
+# ----------------------------  MAIN  ------------------------------------------
+
+
 unset usage
 if [ "$1" = "--usage" ]; then
   usage="1"
   shift
+  echo -e "${BOLD}DevMac Usage${ENDC}"
+else
+  echo -e "${BOLD}DevMac Help${ENDC}"
 fi
+echo -e "-------------------------------------\n"
+echo
 
 if [ -z "$1" ] || [ "$1" == "devmac" ]; then
-  echo "devmac:"
-  printf "%0.1s" "="{1..7}
-  echo -e "\n   Mac OS X installation and management utility for developers.\n"
+  echo -e "Mac OS X installation and management utility for developers.\n"
   echo "Usage: devmac <command> [<args>]"
   [ -z "$usage" ] || exit
   echo
   echo "Some useful devmac commands are:"
-  print_summaries commands configure local global shell install uninstall rehash version versions which whence
+  bootstrap install
   echo
   echo "See \`devmac help <command>' for information on a specific command."
   echo "For full documentation, see: https://github.com/joheinemann/devmac#readme"

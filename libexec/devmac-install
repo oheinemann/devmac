@@ -1,0 +1,187 @@
+#!/bin/bash
+#
+# Summary: Install the software of the mac.
+#
+# Usage: devmac install
+#
+# Installs the mac development software.
+#
+# This is the documentation here...
+
+set -e
+[ -n "$DEVMAC_DEBUG" ] && set -x || Q="-q"
+
+# Keep sudo timestamp updated while DevMac is running.
+if [ "$1" = "--sudo-wait" ]; then
+  while true; do
+    mkdir -p "/var/db/sudo/$SUDO_USER"
+    touch "/var/db/sudo/$SUDO_USER"
+    sleep 1
+  done
+  exit 0
+fi
+
+DEVMAC_SUCCESS=""
+
+# Set colors
+BOLD='\033[1m'
+RED='\033[91m'
+GREEN='\033[92m'
+BLUE='\033[94m'
+ENDC='\033[0m'
+
+
+# ----------------------------  Output functions  ------------------------------
+
+
+error_msg() {
+  echo -e "${BOLD}${RED}!!! $*${ENDC}" >&2
+}
+
+cleanup() {
+  set +e
+  if [ -n "$DEVMAC_SUDO_WAIT_PID" ]; then
+    sudo kill "$DEVMAC_SUDO_WAIT_PID"
+  fi
+  sudo -k
+  rm -f "$CLT_PLACEHOLDER"
+  if [ -z "$DEVMAC_SUCCESS" ]; then
+    echo
+    if [ -n "$DEVMAC_STEP" ]; then
+      error_msg "$DEVMAC_STEP FAILED"
+    else
+      error_msg "FAILED"
+    fi
+    if [ -z "$DEVMAC_DEBUG" ]; then
+      error_msg "Run '$0 --debug' for debugging output."
+    fi
+  fi
+  echo
+}
+
+# Run the cleanup function above, if there is an error
+# or the user aborts the execution
+trap "cleanup" EXIT
+
+
+STDIN_FILE_DESCRIPTOR="0"
+[ -t "$STDIN_FILE_DESCRIPTOR" ] && DEVMAC_INTERACTIVE="1"
+
+
+abort() {
+  DEVMAC_STEP=""
+  error_msg "$*"
+  exit 1
+}
+
+log() {
+  DEVMAC_STEP="$*"
+  echo -e "${BLUE}==>${ENDC} ${BOLD}$*${ENDC}"
+}
+
+logn()  { 
+  DEVMAC_STEP="$*"
+  printf -- "${BLUE}==>${ENDC} ${BOLD}%s:${ENDC} " "$*"
+}
+
+logk()  {
+  DEVMAC_STEP=""
+  echo -e "${GREEN}OK${ENDC}"
+  echo
+}
+
+
+# ----------------------------  Main functions  --------------------------------
+
+
+# Function to get the root user access
+get_root() {
+  # Get the full path of the script
+  DEVMAC_FULL_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
+
+  # Initialise sudo now to save prompting later.
+  log "Enter your password (for sudo access)"
+  sudo -k
+  sudo /usr/bin/true
+  [ -f "$DEVMAC_FULL_PATH" ]
+  sudo bash "$DEVMAC_FULL_PATH" --sudo-wait &
+  DEVMAC_SUDO_WAIT_PID="$!"
+  ps -p "$DEVMAC_SUDO_WAIT_PID" &>/dev/null
+  logk
+}
+
+
+# Function to update Homebrew
+update_homebrew() {
+  logn "Checking for Homebrew updates"
+  HOMEBREW_PREFIX="$(brew --prefix 2>/dev/null || true)"
+  [ -n "$HOMEBREW_PREFIX" ] || HOMEBREW_PREFIX="/usr/local"
+  [ -d "$HOMEBREW_PREFIX" ] || sudo mkdir -p "$HOMEBREW_PREFIX"
+
+  HOMEBREW_REPOSITORY="$(brew --repository 2>/dev/null || true)"
+  [ -n "$HOMEBREW_REPOSITORY" ] || HOMEBREW_REPOSITORY="/usr/local/Homebrew"
+  [ -d "$HOMEBREW_REPOSITORY" ] || sudo mkdir -p "$HOMEBREW_REPOSITORY"
+
+  # Download Homebrew.
+  export GIT_DIR="$HOMEBREW_REPOSITORY/.git" GIT_WORK_TREE="$HOMEBREW_REPOSITORY"
+  [ -d "$GIT_DIR" ] && HOMEBREW_EXISTING="1"
+  if [ -n "$HOMEBREW_EXISTING" ]
+  then
+    git fetch $Q
+  else
+    git fetch $Q --no-tags --depth=1 --force --update-shallow
+  fi
+  git reset $Q --hard origin/master
+  unset GIT_DIR GIT_WORK_TREE HOMEBREW_EXISTING
+
+  # Update Homebrew.
+  export PATH="$HOMEBREW_PREFIX/bin:$PATH"
+  brew update
+  logk
+}
+
+
+# Check and install any remaining software updates.
+install_software_updates() {
+  logn "Checking for software updates"
+  if softwareupdate -l 2>&1 | grep $Q "No new software available."; then
+    logk
+  else
+    echo
+    log "Installing software updates:"
+    if [ -z "$DEVMAC_CI" ]; then
+      sudo softwareupdate --install --all
+      xcode_license
+    else
+      echo "Skipping software updates for CI"
+    fi
+    logk
+  fi
+}
+
+
+# ----------------------------  MAIN  ------------------------------------------
+
+
+if [ -z "${DEVMAC_HEADER}" ]; then
+  echo -e "${BOLD}DevMac Installation${ENDC}"
+  echo "-------------------------------------"
+  echo
+fi
+
+# Get the root user access
+get_root
+
+# Update Homebrew.
+update_homebrew
+
+# Check and install any remaining software updates.
+install_software_updates
+
+
+DEVMAC_SUCCESS="1"
+
+
+echo
+echo -e "${BOLD}Your system is now READY!${ENDC}"
+echo
