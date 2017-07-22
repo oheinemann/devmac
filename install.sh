@@ -147,7 +147,7 @@ clone_repository "https://github.com/joheinemann/devmac.git" "$HOME/.devmac"
 
 
 DEVMAC_SUCCESS="1"
-
+export DEVMAC_HEADER="1"
 
 # Add the bin path to the global path and bootstrap "devmac"
 export PATH="$HOME/.devmac/bin:$PATH"
