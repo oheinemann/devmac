@@ -34,6 +34,7 @@ cleanup() {
 # or the user aborts the execution
 trap "cleanup" EXIT
 
+
 abort() {
   DEVMAC_STEP=""
   error_msg "$*"
@@ -144,7 +145,9 @@ check_git
 # Clone/Update the "devmac" repository into our home directory
 clone_repository "https://github.com/joheinemann/devmac.git" "$HOME/.devmac"
 
+
 DEVMAC_SUCCESS="1"
+
 
 # Add the bin path to the global path and bootstrap "devmac"
 export PATH="$HOME/.devmac/bin:$PATH"
