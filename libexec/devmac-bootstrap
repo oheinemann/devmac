@@ -51,6 +51,7 @@ cleanup() {
   sudo -k
   rm -f "$CLT_PLACEHOLDER"
   if [ -z "$DEVMAC_SUCCESS" ]; then
+    echo
     if [ -n "$DEVMAC_STEP" ]; then
       error_msg "$DEVMAC_STEP FAILED"
     else
