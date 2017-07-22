@@ -25,6 +25,8 @@ if [ "$1" = "--sudo-wait" ]; then
   exit 0
 fi
 
+DEVMAC_SUCCESS=""
+
 # Set colors
 BOLD='\033[1m'
 RED='\033[91m'
@@ -32,6 +34,9 @@ GREEN='\033[92m'
 YELLOW='\033[93m'
 BLUE='\033[94m'
 ENDC='\033[0m'
+
+
+# ----------------------------  Output functions  ------------------------------
 
 
 cleanup() {
@@ -57,26 +62,39 @@ cleanup() {
 # or the user aborts the execution
 trap "cleanup" EXIT
 
-version="1.0.0"
-update="2017/07/07"
 
 STDIN_FILE_DESCRIPTOR="0"
 [ -t "$STDIN_FILE_DESCRIPTOR" ] && DEVMAC_INTERACTIVE="1"
 
 
+abort() {
+  DEVMAC_STEP=""
+  echo -e "${BOLD}${RED}!!! $*${ENDC}" >&2
+  exit 1
+}
+
+log() {
+  DEVMAC_STEP="$*"
+  echo -e "${BLUE}==>${ENDC} ${BOLD}$*${ENDC}"
+}
+
+logn()  { 
+  DEVMAC_STEP="$*"
+  printf -- "${BLUE}==>${ENDC} ${BOLD}%s${ENDC} " "$*"
+}
+
+logk()  {
+  DEVMAC_STEP=""
+  echo -e "${GREEN}OK${ENDC}"
+  echo
+}
 
 
-# Some debugging functions
-abort() { DEVMAC_STEP="";   echo "!!! $*" >&2; exit 1; }
-log()   { DEVMAC_STEP="$*"; echo "==> $*"; }
-logn()  { DEVMAC_STEP="$*"; printf -- "==> %s " "$*"; }
-logk()  { DEVMAC_STEP="";   echo -e "${GREEN}OK${ENDC}"; echo ; }
+# ----------------------------  Main functions  --------------------------------
 
 
-
-
-# Check macOS version and user
-bootstrap() {
+# Function to get the root user access
+get_root() {
   # Get the full path of the script
   DEVMAC_FULL_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 
@@ -92,10 +110,8 @@ bootstrap() {
 }
 
 
-
-
-# Check and enable full-disk encryption.
-full_disk_encryption() {
+# Function to check and enable full-disk encryption.
+check_disk_encryption() {
   logn "Checking full-disk encryption status"
   if fdesetup status | grep $Q -E "FileVault is (On|Off, but will be enabled after the next restart)."; then
     echo
@@ -116,9 +132,7 @@ full_disk_encryption() {
 }
 
 
-
-
-# Check if the Xcode license is agreed to and agree if not.
+# Function to check if the Xcode license is agreed to and agree if not.
 xcode_license() {
   if /usr/bin/xcrun clang 2>&1 | grep $Q license; then
     if [ -n "$DEVMAC_INTERACTIVE" ]; then
@@ -132,9 +146,7 @@ xcode_license() {
 }
 
 
-
-
-# Install the Xcode Command Line Tools.
+# Function to install the Xcode Command Line Tools.
 install_xcode_commandline_tools() {
   DEVMAC_DIR=$("xcode-select" -print-path 2>/dev/null || true)
   if [ -z "$DEVMAC_DIR" ] || ! [ -f "$DEVMAC_DIR/usr/bin/git" ] \
@@ -165,9 +177,7 @@ install_xcode_commandline_tools() {
 }
 
 
-
-
-# Setup Homebrew directory and permissions.
+# Function to setup Homebrew directory and permissions.
 install_homebrew() {
   logn "Checking for Homebrew installation:"
   HOMEBREW_PREFIX="$(brew --prefix 2>/dev/null || true)"
@@ -228,9 +238,7 @@ install_software_updates() {
 }
 
 
-
-
-# Install Python
+# Function to install Python
 install_python() {
   logn "Checking for Python installation:"
   if ! brew list python3 > /dev/null 2>&1
@@ -244,9 +252,7 @@ install_python() {
 }
 
 
-
-
-# Install Ansible (using pip is the officially supported way)
+# Function to install Ansible (using pip is the officially supported way)
 install_ansible() {
   logn "Checking for Ansible installation:"
   if ! pip3 show ansible > /dev/null 2>&1
@@ -257,13 +263,15 @@ install_ansible() {
   logk
 }
 
-DEVMAC_SUCCESS=""
 
-# check the user, the macOS version and get the admin password
-bootstrap
+# ----------------------------  MAIN  ------------------------------------------
+
+
+# Get the root user access
+get_root
 
 # Check and enable full-disk encryption.
-full_disk_encryption
+check_disk_encryption
 
 # Install the Xcode Command Line Tools.
 install_xcode_commandline_tools
@@ -271,14 +279,12 @@ install_xcode_commandline_tools
 # Download Homebrew.
 install_homebrew
 
-# Check and install any remaining software updates.
-#install_software_updates
-
 # Install Python
 install_python
 
 # Install Ansible
 install_ansible
+
 
 DEVMAC_SUCCESS="1"
 
