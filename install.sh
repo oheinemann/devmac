@@ -14,14 +14,18 @@ ENDC='\033[0m'
 # ----------------------------  Output functions  ------------------------------
 
 
+error_msg() {
+  echo -e "${BOLD}${RED}!!! $*${ENDC}" >&2
+}
+
 cleanup() {
   set +e
   if [ -z "$DEVMAC_SUCCESS" ]; then
     echo 
     if [ -n "$DEVMAC_STEP" ]; then
-      echo -e "${BOLD}${RED}!!! $DEVMAC_STEP FAILED${ENDC}" >&2
+      error_msg "$DEVMAC_STEP FAILED"
     else
-      echo -e "${BOLD}${RED}!!! FAILED${ENDC}" >&2
+      error_msg "FAILED"
     fi
   fi
 }
@@ -30,10 +34,9 @@ cleanup() {
 # or the user aborts the execution
 trap "cleanup" EXIT
 
-
 abort() {
   DEVMAC_STEP=""
-  echo -e "${BOLD}${RED}!!! $*${ENDC}" >&2
+  error_msg "$*"
   exit 1
 }
 
@@ -141,6 +144,10 @@ check_git
 # Clone/Update the "devmac" repository into our home directory
 clone_repository "https://github.com/joheinemann/devmac.git" "$HOME/.devmac"
 
+DEVMAC_SUCCESS="1"
+
 # Add the bin path to the global path and bootstrap "devmac"
 export PATH="$HOME/.devmac/bin:$PATH"
 devmac bootstrap
+
+  
