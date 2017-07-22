@@ -12,10 +12,14 @@
 set -e
 [ -n "$DEVMAC_DEBUG" ] && set -x
 
-version="0.0.1"
-
 cd "$DEVMAC_ROOT"
+if [ -f VERSION ]; then
+  version=`cat VERSION`
+fi
 git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
 git_revision="${git_revision#v}"
 
-echo "devmac v${git_revision:-$version}"
+echo -e "${BOLD}DevMac Version${ENDC}"
+echo "-------------------------------------"
+echo
+echo "v${git_revision:-$version}"

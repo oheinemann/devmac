@@ -31,7 +31,6 @@ DEVMAC_SUCCESS=""
 BOLD='\033[1m'
 RED='\033[91m'
 GREEN='\033[92m'
-YELLOW='\033[93m'
 BLUE='\033[94m'
 ENDC='\033[0m'
 
@@ -154,7 +153,7 @@ install_xcode_commandline_tools() {
   if [ -z "$DEVMAC_DIR" ] || ! [ -f "$DEVMAC_DIR/usr/bin/git" ] \
                           || ! [ -f "/usr/include/iconv.h" ]
   then
-    log "Installing the Xcode Command Line Tools:"
+    log "Installing the Xcode Command Line Tools"
     CLT_PLACEHOLDER="/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress"
     sudo touch "$CLT_PLACEHOLDER"
     CLT_PACKAGE=$(softwareupdate -l | \
@@ -164,7 +163,7 @@ install_xcode_commandline_tools() {
     sudo rm -f "$CLT_PLACEHOLDER"
     if ! [ -f "/usr/include/iconv.h" ]; then
       if [ -n "$DEVMAC_INTERACTIVE" ]; then
-        logn "Requesting user install of Xcode Command Line Tools:"
+        logn "Requesting user install of Xcode Command Line Tools"
         xcode-select --install
       else
         abort "Run 'xcode-select --install' to install the Xcode Command Line Tools."
@@ -179,7 +178,7 @@ install_xcode_commandline_tools() {
 
 # Function to setup Homebrew directory and permissions.
 install_homebrew() {
-  logn "Checking for Homebrew installation:"
+  logn "Checking for Homebrew installation"
   HOMEBREW_PREFIX="$(brew --prefix 2>/dev/null || true)"
   [ -n "$HOMEBREW_PREFIX" ] || HOMEBREW_PREFIX="/usr/local"
   [ -d "$HOMEBREW_PREFIX" ] || sudo mkdir -p "$HOMEBREW_PREFIX"
@@ -200,15 +199,13 @@ install_homebrew() {
     ln -sf "$HOMEBREW_REPOSITORY/bin/brew" "$HOMEBREW_PREFIX/bin/brew"
   fi
 
-
   # Download Homebrew.
   export GIT_DIR="$HOMEBREW_REPOSITORY/.git" GIT_WORK_TREE="$HOMEBREW_REPOSITORY"
   [ -d "$GIT_DIR" ] && HOMEBREW_EXISTING="1"
   git init $Q
   git config remote.origin.url "https://github.com/Homebrew/brew"
   git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-  if [ -n "$HOMEBREW_EXISTING" ]
-  then
+  if [ -n "$HOMEBREW_EXISTING" ]; then
     git fetch $Q
   else
     git fetch $Q --no-tags --depth=1 --force --update-shallow
@@ -219,28 +216,9 @@ install_homebrew() {
 }
 
 
-# Check and install any remaining software updates.
-install_software_updates() {
-  logn "Checking for software updates:"
-  if softwareupdate -l 2>&1 | grep $Q "No new software available."; then
-    logk
-  else
-    echo
-    log "Installing software updates:"
-    if [ -z "$DEVMAC_CI" ]; then
-      sudo softwareupdate --install --all
-      xcode_license
-    else
-      echo "Skipping software updates for CI"
-    fi
-    logk
-  fi
-}
-
-
 # Function to install Python
 install_python() {
-  logn "Checking for Python installation:"
+  logn "Checking for Python installation"
   if ! brew list python3 > /dev/null 2>&1
   then
       echo -e "${BLUE}Installing Python 3.x${ENDC}"
@@ -254,7 +232,7 @@ install_python() {
 
 # Function to install Ansible (using pip is the officially supported way)
 install_ansible() {
-  logn "Checking for Ansible installation:"
+  logn "Checking for Ansible installation"
   if ! pip3 show ansible > /dev/null 2>&1
   then
       echo -e "${BLUE}Installing Ansible${ENDC}"
@@ -266,6 +244,12 @@ install_ansible() {
 
 # ----------------------------  MAIN  ------------------------------------------
 
+
+if [ -z "${DEVMAC_HEADER}" ]; then
+  echo -e "${BOLD}DevMac Boostrap${ENDC}"
+  echo "-------------------------------------"
+  echo
+fi
 
 # Get the root user access
 get_root
