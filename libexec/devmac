@@ -96,7 +96,7 @@ if [[ "$2" = "--help"  || "$2" = "-h"  ]]; then
 fi
 
 if [ -z "${DEVMAC_HEADER}" ]; then
-  show_header()
+  show_header
 fi
 
 case "$command" in
