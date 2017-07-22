@@ -1,18 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-# Keep sudo timestamp updated while DevMac is running.
-if [ "$1" = "--sudo-wait" ]; then
-  while true; do
-    mkdir -p "/var/db/sudo/$SUDO_USER"
-    touch "/var/db/sudo/$SUDO_USER"
-    sleep 1
-  done
-  exit 0
-fi
-
-Q="-q"
-
 # Set colors
 BOLD='\033[1m'
 RED='\033[91m'
@@ -21,25 +9,6 @@ YELLOW='\033[93m'
 BLUE='\033[94m'
 ENDC='\033[0m'
 
-
-cleanup() {
-  set +e
-  if [ -n "$DEVMAC_SUDO_WAIT_PID" ]; then
-    sudo kill "$DEVMAC_SUDO_WAIT_PID"
-  fi
-  sudo -k
-  if [ -z "$DEVMAC_SUCCESS" ]; then
-    if [ -n "$DEVMAC_STEP" ]; then
-      echo "!!! $DEVMAC_STEP FAILED" >&2
-    else
-      echo "!!! FAILED" >&2
-    fi
-  fi
-}
-
-# Run the cleanup function above, if there is an error
-# or the user aborts the execution
-trap "cleanup" EXIT
 
 version="1.0.0"
 update="2017/07/07"
@@ -103,7 +72,7 @@ DEVMAC_SUCCESS=""
 
 # Check the macOS version
 logn "Checking macOS version:"
-sw_vers -productVersion | grep $Q -E "^10.(9|10|11|12)" || {
+sw_vers -productVersion | grep -q -E "^10.(9|10|11|12)" || {
 	abort "Run DevMac on macOS 10.9/10/11/12."
 }
 logk
@@ -111,22 +80,17 @@ logk
 # Check the current logged in user
 logn "Checking current user:"
 [ "$USER" = "root" ] && abort "Run DevMac as yourself, not root."
-groups | grep $Q admin || abort "Add $USER to the admin group."
+groups | grep -q admin || abort "Add $USER to the admin group."
 logk
 
-# Get the full path of the script
-DEVMAC_FULL_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 
-# Initialise sudo now to save prompting later.
-log "Enter your password (for sudo access)"
-sudo -k
-sudo /usr/bin/true
-[ -f "$DEVMAC_FULL_PATH" ]
-sudo bash "$DEVMAC_FULL_PATH" --sudo-wait &
-DEVMAC_SUDO_WAIT_PID="$!"
-ps -p "$DEVMAC_SUDO_WAIT_PID" &>/dev/null
-logk
+check_git
 
+
+clone_repository "https://github.com/joheinemann/devmac.git" "$HOME/.devmac"
+
+export PATH="$HOME/.devmac/bin:$PATH"
+devmac bootstrap
 
 DEVMAC_SUCCESS="1"
 

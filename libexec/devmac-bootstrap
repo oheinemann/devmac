@@ -1,0 +1,288 @@
+#!/usr/bin/env bash
+#
+# Summary: Display help for a command
+#
+# Usage: devmac help [--usage] COMMAND
+#
+# Parses and displays help contents from a command's source file.
+#
+# A command is considered documented if it starts with a comment block
+# that has a `Summary:' or `Usage:' section. Usage instructions can
+# span multiple lines as long as subsequent lines are indented.
+# The remainder of the comment block is displayed as extended
+# documentation.
+
+set -e
+[ -n "$DEVMAC_DEBUG" ] && set -x || Q="-q"
+
+# Keep sudo timestamp updated while DevMac is running.
+if [ "$1" = "--sudo-wait" ]; then
+  while true; do
+    mkdir -p "/var/db/sudo/$SUDO_USER"
+    touch "/var/db/sudo/$SUDO_USER"
+    sleep 1
+  done
+  exit 0
+fi
+
+# Set colors
+BOLD='\033[1m'
+RED='\033[91m'
+GREEN='\033[92m'
+YELLOW='\033[93m'
+BLUE='\033[94m'
+ENDC='\033[0m'
+
+
+cleanup() {
+  set +e
+  if [ -n "$DEVMAC_SUDO_WAIT_PID" ]; then
+    sudo kill "$DEVMAC_SUDO_WAIT_PID"
+  fi
+  sudo -k
+  rm -f "$CLT_PLACEHOLDER"
+  if [ -z "$DEVMAC_SUCCESS" ]; then
+    if [ -n "$DEVMAC_STEP" ]; then
+      echo "!!! $DEVMAC_STEP FAILED" >&2
+    else
+      echo "!!! FAILED" >&2
+    fi
+    if [ -z "$DEVMAC_DEBUG" ]; then
+      echo "!!! Run '$0 --debug' for debugging output." >&2
+    fi
+  fi
+}
+
+# Run the cleanup function above, if there is an error
+# or the user aborts the execution
+trap "cleanup" EXIT
+
+version="1.0.0"
+update="2017/07/07"
+
+STDIN_FILE_DESCRIPTOR="0"
+[ -t "$STDIN_FILE_DESCRIPTOR" ] && DEVMAC_INTERACTIVE="1"
+
+
+
+
+# Some debugging functions
+abort() { DEVMAC_STEP="";   echo "!!! $*" >&2; exit 1; }
+log()   { DEVMAC_STEP="$*"; echo "==> $*"; }
+logn()  { DEVMAC_STEP="$*"; printf -- "==> %s " "$*"; }
+logk()  { DEVMAC_STEP="";   echo -e "${GREEN}OK${ENDC}"; echo ; }
+
+
+
+
+# Check macOS version and user
+bootstrap() {
+  # Get the full path of the script
+  DEVMAC_FULL_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
+
+  # Initialise sudo now to save prompting later.
+  log "Enter your password (for sudo access)"
+  sudo -k
+  sudo /usr/bin/true
+  [ -f "$DEVMAC_FULL_PATH" ]
+  sudo bash "$DEVMAC_FULL_PATH" --sudo-wait &
+  DEVMAC_SUDO_WAIT_PID="$!"
+  ps -p "$DEVMAC_SUDO_WAIT_PID" &>/dev/null
+  logk
+}
+
+
+
+
+# Check and enable full-disk encryption.
+full_disk_encryption() {
+  logn "Checking full-disk encryption status"
+  if fdesetup status | grep $Q -E "FileVault is (On|Off, but will be enabled after the next restart)."; then
+    echo
+    logk
+  elif [ -n "$DEVMAC_CI" ]; then
+    echo
+    logn "Skipping full-disk encryption for CI"
+  elif [ -n "$DEVMAC_INTERACTIVE" ]; then
+    echo
+    log "Enabling full-disk encryption on next reboot:"
+    sudo fdesetup enable -user "$USER" \
+      | tee ~/Desktop/"FileVault Recovery Key.txt"
+    logk
+  else
+    echo
+    abort "Run 'sudo fdesetup enable -user \"$USER\"' to enable full-disk encryption."
+  fi
+}
+
+
+
+
+# Check if the Xcode license is agreed to and agree if not.
+xcode_license() {
+  if /usr/bin/xcrun clang 2>&1 | grep $Q license; then
+    if [ -n "$DEVMAC_INTERACTIVE" ]; then
+      logn "Asking for Xcode license confirmation:"
+      sudo xcodebuild -license
+      logk
+    else
+      abort "Run 'sudo xcodebuild -license' to agree to the Xcode license."
+    fi
+  fi
+}
+
+
+
+
+# Install the Xcode Command Line Tools.
+install_xcode_commandline_tools() {
+  DEVMAC_DIR=$("xcode-select" -print-path 2>/dev/null || true)
+  if [ -z "$DEVMAC_DIR" ] || ! [ -f "$DEVMAC_DIR/usr/bin/git" ] \
+                             || ! [ -f "/usr/include/iconv.h" ]
+  then
+    log "Installing the Xcode Command Line Tools:"
+    CLT_PLACEHOLDER="/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress"
+    sudo touch "$CLT_PLACEHOLDER"
+    CLT_PACKAGE=$(softwareupdate -l | \
+                  grep -B 1 -E "Command Line (Developer|Tools)" | \
+                  awk -F"*" '/^ +\*/ {print $2}' | sed 's/^ *//' | head -n1)
+    sudo softwareupdate -i "$CLT_PACKAGE"
+    sudo rm -f "$CLT_PLACEHOLDER"
+    if ! [ -f "/usr/include/iconv.h" ]; then
+      if [ -n "$DEVMAC_INTERACTIVE" ]; then
+        echo
+        logn "Requesting user install of Xcode Command Line Tools:"
+        xcode-select --install
+      else
+        echo
+        abort "Run 'xcode-select --install' to install the Xcode Command Line Tools."
+      fi
+    fi
+    logk
+  fi
+
+  xcode_license
+}
+
+
+
+
+# Setup Homebrew directory and permissions.
+install_homebrew() {
+  logn "Checking for Homebrew installation:"
+  HOMEBREW_PREFIX="$(brew --prefix 2>/dev/null || true)"
+  [ -n "$HOMEBREW_PREFIX" ] || HOMEBREW_PREFIX="/usr/local"
+  [ -d "$HOMEBREW_PREFIX" ] || sudo mkdir -p "$HOMEBREW_PREFIX"
+  sudo chown "root:wheel" "$HOMEBREW_PREFIX"
+  (
+    cd "$HOMEBREW_PREFIX"
+    sudo mkdir -p               Cellar Frameworks bin etc include lib opt sbin share var
+    sudo chown -R "$USER:admin" Cellar Frameworks bin etc include lib opt sbin share var
+  )
+
+  HOMEBREW_REPOSITORY="$(brew --repository 2>/dev/null || true)"
+  [ -n "$HOMEBREW_REPOSITORY" ] || HOMEBREW_REPOSITORY="/usr/local/Homebrew"
+  [ -d "$HOMEBREW_REPOSITORY" ] || sudo mkdir -p "$HOMEBREW_REPOSITORY"
+  sudo chown -R "$USER:admin" "$HOMEBREW_REPOSITORY"
+
+  if [ $HOMEBREW_PREFIX != $HOMEBREW_REPOSITORY ]
+  then
+    ln -sf "$HOMEBREW_REPOSITORY/bin/brew" "$HOMEBREW_PREFIX/bin/brew"
+  fi
+
+
+  # Download Homebrew.
+  export GIT_DIR="$HOMEBREW_REPOSITORY/.git" GIT_WORK_TREE="$HOMEBREW_REPOSITORY"
+  [ -d "$GIT_DIR" ] && HOMEBREW_EXISTING="1"
+  git init $Q
+  git config remote.origin.url "https://github.com/Homebrew/brew"
+  git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+  if [ -n "$HOMEBREW_EXISTING" ]
+  then
+    git fetch $Q
+  else
+    git fetch $Q --no-tags --depth=1 --force --update-shallow
+  fi
+  git reset $Q --hard origin/master
+  unset GIT_DIR GIT_WORK_TREE HOMEBREW_EXISTING
+  logk
+}
+
+
+# Check and install any remaining software updates.
+install_software_updates() {
+  logn "Checking for software updates:"
+  if softwareupdate -l 2>&1 | grep $Q "No new software available."; then
+    logk
+  else
+    echo
+    log "Installing software updates:"
+    if [ -z "$DEVMAC_CI" ]; then
+      sudo softwareupdate --install --all
+      xcode_license
+    else
+      echo "Skipping software updates for CI"
+    fi
+    logk
+  fi
+}
+
+
+
+
+# Install Python
+install_python() {
+  logn "Checking for Python installation:"
+  if ! brew list python3 > /dev/null 2>&1
+  then
+      echo -e "${BLUE}Installing Python 3.x${ENDC}"
+      brew install python3
+      logk
+  else
+      logk
+  fi
+}
+
+
+
+
+# Install Ansible (using pip is the officially supported way)
+install_ansible() {
+  logn "Checking for Ansible installation:"
+  if ! pip3 show ansible > /dev/null 2>&1
+  then
+      echo -e "${BLUE}Installing Ansible${ENDC}"
+      pip3 install ansible
+  fi
+  logk
+}
+
+DEVMAC_SUCCESS=""
+
+# check the user, the macOS version and get the admin password
+bootstrap
+
+# Check and enable full-disk encryption.
+full_disk_encryption
+
+# Install the Xcode Command Line Tools.
+install_xcode_commandline_tools
+
+# Download Homebrew.
+install_homebrew
+
+# Check and install any remaining software updates.
+#install_software_updates
+
+# Install Python
+install_python
+
+# Install Ansible
+install_ansible
+
+DEVMAC_SUCCESS="1"
+
+
+echo
+echo -e "${BOLD}Your system is now READY!${ENDC}"
+echo
