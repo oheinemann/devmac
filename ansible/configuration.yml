@@ -1,0 +1,9 @@
+---
+
+- hosts: localhost
+  connection: local
+
+  pre_tasks:
+    - name: Debugging from configuration
+      debug:
+        msg: "CONFIURATION"

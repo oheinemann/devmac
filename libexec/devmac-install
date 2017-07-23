@@ -136,6 +136,7 @@ update_homebrew() {
 
   # Update Homebrew.
   export PATH="$HOMEBREW_PREFIX/bin:$PATH"
+  echo 
   brew update
   logk
 }
@@ -178,6 +179,8 @@ update_homebrew
 # Check and install any remaining software updates.
 install_software_updates
 
+# Run the Ansible playbook
+ansible-playbook -i localhost, -e ansible_python_interpreter=/usr/local/bin/python3 ansible/all.yml && \
 
 DEVMAC_SUCCESS="1"
 

@@ -1,0 +1,93 @@
+---
+
+software_brew_taps:
+  - caskroom/fonts
+  - caskroom/versions
+  - OJFord/formulae
+
+
+software_brew_casks:
+
+  # Fonts
+  - font-source-code-pro
+  - font-source-code-pro-for-powerline
+
+
+  # browser
+  - firefox
+  - google-chrome
+
+  # development
+  - jetbrains-toolbox
+  - phpstorm
+  - macdown
+  - vagrant
+  - virtualbox
+  - mysqlworkbench
+  
+  # shell
+  - iterm2
+
+  # productivity
+  - 1password
+  - microsoft-office
+
+  # design & concept
+  - sketch
+  - adobe-creative-cloud
+#  - adobe-photoshop-cc
+#  - adobe-acrobat-pro
+  - axure-rp
+
+  # connectivity & communication
+  - skype
+  - slack
+  - synology-cloud-station-drive
+  - teamviewer
+  - viscosity
+  - dropbox
+
+  # other
+  - mactracker
+
+
+
+software_brew_packages:
+  # Unix Utilities
+#  - android-platform-tools
+  - bash
+  - cdiff
+#  - ctags
+  - curl
+#  - duti
+#  - dos2unix
+#  - ffmpeg
+#  - findutils
+#  - fish
+  - git
+#  - gnu-sed
+#  - hugo
+  - loginitems
+#  - mas
+#  - md5sha1sum
+#  - p7zip
+#  - rlwrap
+#  - rsync
+#  - sassc
+#  - shellcheck
+  - tree
+  - unrar
+#  - watch
+  - wget
+  - xz
+
+  # Programming Languages
+#  - go
+  - rbenv
+  - ruby-build
+
+  # Completions
+  - bash-completion
+  - vagrant-completion
+#  - ruby-completion
+#  - rake-completion

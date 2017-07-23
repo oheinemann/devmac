@@ -1,0 +1,24 @@
+---
+
+# install the dnsmasq package from homebrew
+- name: install dnsmasq with homebrew
+  homebrew: name=dnsmasq state=present
+
+
+# create a dev file inside the resolver directory
+- name: add tld to resolver
+  become: yes
+  lineinfile:
+    state: present
+    line: nameserver 127.0.0.1
+    create: yes
+    dest: /etc/resolver/{{ dnsmasq_tld }}
+    owner: root
+    group: wheel
+
+
+# add the *.dev domain in the dnsmasq configuration
+- name: resolve tld to localhost
+  template:
+    src: dnsmasq.conf.j2
+    dest: /usr/local/etc/dnsmasq.conf

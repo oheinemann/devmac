@@ -1,0 +1,14 @@
+---
+
+- hosts: localhost
+  connection: local
+
+  pre_tasks:
+    - name: Debugging from development
+      debug:
+        msg: "DEVELOPMENT"
+
+  tasks:
+  - name: install and configure dnsmasq
+    include_role:
+      name: dnsmasq

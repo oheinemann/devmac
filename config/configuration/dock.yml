@@ -1,0 +1,17 @@
+---
+
+# Dock applications (in the left section)
+dock_apps:
+  - Launchpad
+  - Safari
+  - Sublime Text
+  - Slack
+  - Utilities/Terminal
+  - App Store
+  - System Preferences
+
+
+# Dock folders (in the right section)
+dock_folders:
+  - ~/Downloads
+  - { dest: ~/Screenshots, view: grid, display: stack, sort: datecreated }

@@ -1,0 +1,22 @@
+---
+
+- hosts: localhost
+  connection: local
+
+  pre_tasks:
+    - name: Debugging from all.yml
+      debug:
+        msg: "{{ playbook_dir }}"
+
+# Include "system" playbook for the system configuration
+- include: system.yml
+    
+# Include "development" playbook for development (like nginx, php or mysql)
+- include: development.yml
+    
+# Include "software" playbook for the software installation
+- include: software.yml
+    
+# Include "configuration" playbook for the configuration of the dock, 
+# the launchpad or startup-items and default apps for files
+- include: configuration.yml
