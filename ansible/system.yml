@@ -7,3 +7,16 @@
     - name: Debugging from system
       debug:
         msg: "SYSTEM"
+    - name: include all system variables and save them in 'system'
+      include_vars:
+        file: "{{ playbook_dir }}/../config/system.yml"
+        name: system
+  
+  roles:
+    - name: Load macOS defaults
+      role: macos
+      vars:
+        timezone: "{{ system.timezone }}"
+        computer_sleep_time: "{{ system.computer_sleep_time }}"
+        display_sleep_time: "{{ system.display_sleep_time }}"
+        screenshot_dir: "{{ system.screenshot_dir }}"

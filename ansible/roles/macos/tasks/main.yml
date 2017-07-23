@@ -1,0 +1,58 @@
+---
+
+# set the computer sleep time
+- name: check the current computer sleep time
+  command: systemsetup -getcomputersleep
+  changed_when: false
+  become: yes
+  register: current_computer_sleep_time
+
+- name: set the computer sleep time
+  command: systemsetup -setcomputersleep {{ computer_sleep_time }}
+  become: yes
+  when: "'Computer Sleep: {{ computer_sleep_time }}' != '{{ current_computer_sleep_time.stdout.replace('after ', '').replace('minutes', '') }}'"
+
+
+# set the display sleep time
+- name: check the current display sleep time
+  command: systemsetup -getdisplaysleep
+  changed_when: false
+  become: yes
+  register: current_display_sleep_time
+
+- name: set the display sleep time
+  command: systemsetup -setdisplaysleep {{ display_sleep_time }}
+  become: yes
+  when: "'Display Sleep: {{ display_sleep_time }}' != '{{ current_display_sleep_time.stdout.replace('after ', '').replace('minutes', '') }}'"
+
+
+# set the timezone
+- name: check the current timezone
+  command: systemsetup -gettimezone
+  changed_when: false
+  become: yes
+  register: current_timezone
+
+- name: set the timezone
+  command: systemsetup -settimezone {{ timezone }}
+  become: yes
+  when: "'Time Zone: {{ timezone }}' != '{{ current_timezone.stdout }}'"
+
+
+# make the 'Library' folder inside of the User folder visible
+- name: check flags for the user library folder
+  changed_when: false
+  command: ls -lOd ~/Library
+  register: library_flags
+
+- name: unhide the user library folder
+  command: chflags nohidden ~/Library
+  when: "'hidden' in library_flags"
+
+
+
+# create folder for the screenshoots if not exists
+- name: create the screenshots folder
+  file: path={{ screenshot_dir }} state=directory
+
+

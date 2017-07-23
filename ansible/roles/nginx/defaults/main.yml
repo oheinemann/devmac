@@ -1,0 +1,8 @@
+---
+
+nginx_pid_file: /usr/local/var/run/nginx.pid
+nginx_dir:  /usr/local/opt/nginx
+nginx_log_dir: /usr/local/var/log/nginx
+nginx_port: 80
+nginx_config_dir: /usr/local/etc/nginx
+nginx_sites_dir:  /usr/local/etc/nginx/sites

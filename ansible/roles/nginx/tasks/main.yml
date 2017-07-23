@@ -1,0 +1,24 @@
+---
+
+# install the nginx package from homebrew
+- name: install nginx with homebrew
+  homebrew: name=nginx state=present
+
+
+- name: copy default site
+  copy:
+    src: files/public
+    dest: "{{ nginx_dir }}"
+    owner: "{{ ansible_user }}"
+    group: admin
+    mode: 0755
+  become: true
+  notify: restart nginx
+
+
+- name: copy nginx configuration in place.
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_config_dir }}/nginx.conf"
+    mode: 0644
+  notify: restart nginx

@@ -1,0 +1,5 @@
+---
+
+- name: restart nginx
+  become: yes
+  command: brew services restart nginx
