@@ -4,6 +4,6 @@
   connection: local
 
   pre_tasks:
-    - name: Debugging from software
+    - name: Debugging from applications
       debug:
-        msg: "SOFTWARE"
+        msg: "APPLICATIONS"

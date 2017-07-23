@@ -180,7 +180,33 @@ update_homebrew
 install_software_updates
 
 # Run the Ansible playbook
-ansible-playbook -i localhost, -e ansible_python_interpreter=/usr/local/bin/python3 ansible/all.yml && \
+command="$1"
+case "$command" in
+"-a" | "--all" | "all" )
+  ansible-playbook -i localhost, -e ansible_python_interpreter=/usr/local/bin/python3 ansible/all.yml && \
+  ;;
+"-s" | "--sys" | "system" )
+  ansible-playbook -i localhost, -e ansible_python_interpreter=/usr/local/bin/python3 ansible/system.yml && \
+  ;;
+"-d" | "--dev" | "development" )
+  ansible-playbook -i localhost, -e ansible_python_interpreter=/usr/local/bin/python3 ansible/development.yml && \
+  ;;
+"-c" | "--apps" | "applications" )
+  ansible-playbook -i localhost, -e ansible_python_interpreter=/usr/local/bin/python3 ansible/applications.yml && \
+  ;;
+"-c" | "--config" | "configuration" )
+  ansible-playbook -i localhost, -e ansible_python_interpreter=/usr/local/bin/python3 ansible/configration.yml && \
+  ;;
+* )
+  select file in quit ../ansible/*.yml
+  do
+    if [ "$file" = "quit" ]; then
+    break fi
+    echo "Datei: $file"
+  done
+  ;;
+esac
+
 
 DEVMAC_SUCCESS="1"
 
