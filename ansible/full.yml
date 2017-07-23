@@ -4,7 +4,7 @@
   connection: local
 
   pre_tasks:
-    - name: Debugging from all.yml
+    - name: Debugging from full.yml
       debug:
         msg: "{{ playbook_dir }}"
 
