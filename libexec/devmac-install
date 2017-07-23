@@ -174,14 +174,16 @@ run_install() {
     install_software_updates
   else
     # Update Homebrew.
-    update_homebrew
+#    update_homebrew
 
     # Check and install any remaining software updates.
-    install_software_updates
+#    install_software_updates
 
     # Run the Ansible playbook
-    logn "Running Ansible playbook${ENDC} ${BLUE}$1"
-    ansible-playbook -i localhost, -e ansible_python_interpreter=/usr/local/bin/python3 ansible/$1.yml
+    name=$(echo "$1" | awk '{print tolower($0)}')
+
+    log "Running Ansible playbook${ENDC} ${BLUE}$1 ($name.yml)"
+    ansible-playbook -i localhost, -e ansible_python_interpreter=/usr/local/bin/python3 ansible/$name.yml
   fi
 }
 
@@ -198,25 +200,25 @@ fi
 command="$1"
 case "$command" in
 "-f" | "--full" | "full" )
-  run_install "full"
+  run_install "Full"
   ;;
 "-s" | "--sys" | "system" )
-  run_install "system"
+  run_install "System"
   ;;
 "-d" | "--dev" | "development" )
-  run_install "development"
+  run_install "Development"
   ;;
 "-a" | "--apps" | "applications" )
-  run_install "applications"
+  run_install "Applications"
   ;;
 "-c" | "--config" | "configuration" )
-  run_install "configration"
+  run_install "Configration"
   ;;
 * )
   PS3="Please select installation type: "
-  select selection in "Update Homebrew only" "Install software updates only" full system development applications configuration quit
+  select selection in "Update Homebrew only" "Install software updates only" Full System Development Applications Configuration Quit
   do
-    if [ "$selection" = "quit" ]
+    if [ "$selection" = "Quit" ]
     then
       break
     else
