@@ -84,7 +84,7 @@ EOF
 # Function to check the macOS version
 check_macos() {
   logn "Checking macOS version:"
-  sw_vers -productVersion | grep -q -E "^10.(9|10|11|12)" || {
+  sw_vers -productVersion | grep -q -E "^10.(9|10|11|12|13)" || {
     abort "Run DevMac on macOS 10.9/10/11/12."
   }
   logk
