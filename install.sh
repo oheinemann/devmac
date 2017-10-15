@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 set -e
+[ -n "$DEVMAC_DEBUG" ] && set -x || Q="-q"
+
+# Keep sudo timestamp updated while DevMac is running.
+if [ "$1" = "--sudo-wait" ]; then
+  while true; do
+    mkdir -p "/var/db/sudo/$SUDO_USER"
+    touch "/var/db/sudo/$SUDO_USER"
+    sleep 1
+  done
+  exit 0
+fi
 
 DEVMAC_SUCCESS=""
 
