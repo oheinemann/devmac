@@ -220,6 +220,14 @@ check_user
 # Check if git is installed
 check_git
 
+# Get the root user access
+get_root
+
+# Check if full-disk encryption is enabled.
+check_disk_encryption
+
+# Install the Xcode Command Line Tools.
+install_xcode_commandline_tools
 
 # Clone/Update the "devmac" repository into our home directory
 clone_repository "https://github.com/joheinemann/devmac.git" "$HOME/.devmac"
