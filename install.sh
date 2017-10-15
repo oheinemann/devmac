@@ -1,16 +1,5 @@
 #!/usr/bin/env bash
 set -e
-[ -n "$DEVMAC_DEBUG" ] && set -x || Q="-q"
-
-# Keep sudo timestamp updated while DevMac is running.
-if [ "$1" = "--sudo-wait" ]; then
-  while true; do
-    mkdir -p "/var/db/sudo/$SUDO_USER"
-    touch "/var/db/sudo/$SUDO_USER"
-    sleep 1
-  done
-  exit 0
-fi
 
 DEVMAC_SUCCESS=""
 
@@ -92,84 +81,6 @@ EOF
 }
 
 
-# Function to get the root user access
-get_root() {
-  # Get the full path of the script
-  DEVMAC_FULL_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
-
-  # Initialise sudo now to save prompting later.
-  log "Enter your password (for sudo access)"
-  sudo -k
-  sudo /usr/bin/true
-  [ -f "$DEVMAC_FULL_PATH" ]
-  sudo bash "$DEVMAC_FULL_PATH" --sudo-wait &
-  DEVMAC_SUDO_WAIT_PID="$!"
-  ps -p "$DEVMAC_SUDO_WAIT_PID" &>/dev/null
-  logk
-}
-
-
-# Function to check and enable full-disk encryption.
-check_disk_encryption() {
-  logn "Checking full-disk encryption status"
-  if fdesetup status | grep $Q -E "FileVault is (On|Off, but will be enabled after the next restart)."; then
-    logk
-  elif [ -n "$DEVMAC_CI" ]; then
-    logn "Skipping full-disk encryption for CI"
-  elif [ -n "$DEVMAC_INTERACTIVE" ]; then
-    log "Enabling full-disk encryption on next reboot:"
-    sudo fdesetup enable -user "$USER" \
-      | tee ~/Desktop/"FileVault Recovery Key.txt"
-    logk
-  else
-    abort "Run 'sudo fdesetup enable -user \"$USER\"' to enable full-disk encryption."
-  fi
-}
-
-
-# Function to check if the Xcode license is agreed to and agree if not.
-xcode_license() {
-  if /usr/bin/xcrun clang 2>&1 | grep $Q license; then
-    if [ -n "$DEVMAC_INTERACTIVE" ]; then
-      logn "Asking for Xcode license confirmation"
-      sudo xcodebuild -license
-      logk
-    else
-      abort "Run 'sudo xcodebuild -license' to agree to the Xcode license."
-    fi
-  fi
-}
-
-
-# Function to install the Xcode Command Line Tools.
-install_xcode_commandline_tools() {
-  DEVMAC_DIR=$("xcode-select" -print-path 2>/dev/null || true)
-  if [ -z "$DEVMAC_DIR" ] || ! [ -f "$DEVMAC_DIR/usr/bin/git" ] \
-                          || ! [ -f "/usr/include/iconv.h" ]
-  then
-    log "Installing the Xcode Command Line Tools"
-    CLT_PLACEHOLDER="/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress"
-    sudo touch "$CLT_PLACEHOLDER"
-    CLT_PACKAGE=$(softwareupdate -l | \
-                  grep -B 1 -E "Command Line (Developer|Tools)" | \
-                  awk -F"*" '/^ +\*/ {print $2}' | sed 's/^ *//' | head -n1)
-    sudo softwareupdate -i "$CLT_PACKAGE"
-    sudo rm -f "$CLT_PLACEHOLDER"
-    if ! [ -f "/usr/include/iconv.h" ]; then
-      if [ -n "$DEVMAC_INTERACTIVE" ]; then
-        logn "Requesting user install of Xcode Command Line Tools"
-        xcode-select --install
-      else
-        abort "Run 'xcode-select --install' to install the Xcode Command Line Tools."
-      fi
-    fi
-    logk
-  fi
-
-  xcode_license
-}
-
-
 # Function to check the macOS version
 check_macos() {
   logn "Checking macOS version:"
@@ -231,15 +142,6 @@ check_user
 # Check if git is installed
 check_git
 
-# Get the root user access
-get_root
-
-# Check if full-disk encryption is enabled.
-check_disk_encryption
-
-# Install the Xcode Command Line Tools.
-install_xcode_commandline_tools
-
 # Clone/Update the "devmac" repository into our home directory
 clone_repository "https://github.com/joheinemann/devmac.git" "$HOME/.devmac"
 
@@ -250,5 +152,3 @@ export DEVMAC_HEADER="1"
 # Add the bin path to the global path and bootstrap "devmac"
 export PATH="$HOME/.devmac/bin:$PATH"
 devmac bootstrap
-
-  
