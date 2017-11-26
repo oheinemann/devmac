@@ -1,0 +1,81 @@
+---
+
+- name: Install zsh
+  homebrew: 
+    name: "{{item}}"
+    state: present
+  with_items:
+    - zsh
+
+
+- name: Check if oh-my-zsh is installed
+  stat: 
+    path: ~/.oh-my-zsh
+  register: oh_my_zsh_installed
+
+
+- name: Install oh-my-zsh
+  git: 
+    repo: git://github.com/robbyrussell/oh-my-zsh.git
+    dest: ~/.oh-my-zsh
+    accept_hostkey: true
+  when: oh_my_zsh_installed.stat.exists == false
+
+
+- name: Check if custom theme is installed
+  stat:
+    path: "{{ oh_my_zsh_custom_theme_dir }}/{{ oh_my_zsh_theme.name }}"
+  when: oh_my_zsh_theme.repo is defined and oh_my_zsh_theme.name is defined 
+  register: oh_my_zsh_custom_theme_installed
+
+
+- name: Download Theme {{oh_my_zsh_theme.name}}
+  git: 
+    repo: "{{ oh_my_zsh_theme.repo }}"
+    dest: "{{ oh_my_zsh_custom_theme_dir }}/{{ oh_my_zsh_theme.name }}"
+    accept_hostkey: true
+  when: oh_my_zsh_theme.repo is defined and oh_my_zsh_custom_theme_installed.stat.exists == false
+
+
+- name: Check if plugins are installed
+  stat:
+    path: "{{ oh_my_zsh_plugins_dir }}/{{ item.name }}"
+  with_items: "{{ oh_my_zsh_plugins|default([]) }}"
+  when: item.name != "" 
+  register: zsh_plugins
+
+
+- name: Download zsh plugins
+  git: 
+    repo: "{{ item.item.repo }}"
+    dest: "{{ oh_my_zsh_plugins_dir }}/{{ item.item.name }}"
+    accept_hostkey: true
+  with_items: "{{ zsh_plugins.results }}"
+  when:
+    - not item | skipped
+    - item.stat.exists == false
+
+
+- name: Backup .zshrc
+  command: cp ~/.zshrc ~/.zshrc.orig
+  ignore_errors: True
+  when: oh_my_zsh_installed.stat.exists == false
+
+
+- name: Install zshrc template
+  template: 
+    src: zshrc.j2
+    dest: ~/.zshrc
+  when: oh_my_zsh_installed.stat.exists == false
+
+
+- name: Determine if zsh is default/current shell
+  shell: echo $SHELL
+  changed_when: false
+  register: current_shell
+
+
+- name: Change shell to zsh
+  command: chsh -s /usr/local/bin/zsh
+  become: true
+  when: current_shell.stdout != '/usr/local/bin/zsh'

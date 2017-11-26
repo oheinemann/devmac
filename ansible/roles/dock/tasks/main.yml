@@ -1,0 +1,28 @@
+---
+
+- name: Install dockutil via Homebrew
+  homebrew:
+    name: "dockutil"
+    state: latest
+
+
+- name: Remove all items from the dock
+  command: dockutil --remove all --no-restart
+  changed_when: false
+
+
+- name: Add apps to the dock
+  command: "dockutil --add '/Applications/{{ item }}.app' --no-restart"
+  changed_when: false
+  with_items: "{{ apps }}"
+
+
+- name: Add folders to the dock
+  command: "dockutil --add '{{ item.dest | default(item) }}' --view {{ item.view | default('fan') }} --display {{ item.display | default('stack') }} --sort {{ item.sort | default('dateadded') }} --no-restart"
+  changed_when: false
+  with_items: "{{ folders }}"
+
+
+- name: Restart the dock
+  command: killall Dock
+  changed_when: false

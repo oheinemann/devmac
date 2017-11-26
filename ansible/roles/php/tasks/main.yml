@@ -1,0 +1,58 @@
+---
+
+- name: Ensure the tap homebrew/php is installed
+  homebrew_tap:
+    tap: homebrew/php
+    state: present
+
+
+- name: Install PHP 5.6
+  homebrew:
+    name:  php56
+    state: present
+    install_options: with-fpm,with-imap
+
+
+- name: Change port of PHP-FPM from 9000 to 9056
+  lineinfile:
+    dest: /usr/local/etc/php/5.6/php-fpm.conf
+    regexp: "listen = 127.0.0.1:9000"
+    line: "listen = 127.0.0.1:9056"
+    backrefs: yes
+
+
+- name: Change timezone of php.ini
+  lineinfile:
+    dest: /usr/local/etc/php/5.6/php.ini
+    regexp: ";date.timezone ="
+    line: "date.timezone = Europe/Berlin"
+    backrefs: yes
+  notify: start php-fpm 5.6
+
+
+
+
+#- name: Unlink PHP 5.6
+#  homebrew:
+#    name:  php56
+#    state: unlinked
+#
+#
+#- name: Install PHP 7.0
+#  homebrew:
+#    name:  php70
+#    state: present
+#    install_options: with-fpm,with-imap
+#
+#
+#- name: Unlink PHP 7.0
+#  homebrew:
+#    name:  php70
+#    state: unlinked
+#
+#
+#- name: Install PHP 7.1
+#  homebrew:
+#    name:  php71
+#    state: present
+#    install_options: with-fpm,with-imap

@@ -1,0 +1,9 @@
+---
+
+# prepare the system to install php versions from source
+#- include: prepare.yml
+
+# install php env
+#- include: install.yml
+
+- include: install_versions.yml

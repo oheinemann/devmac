@@ -178,7 +178,7 @@ install_homebrew() {
   HOMEBREW_PREFIX="$(brew --prefix 2>/dev/null || true)"
   [ -n "$HOMEBREW_PREFIX" ] || HOMEBREW_PREFIX="/usr/local"
   [ -d "$HOMEBREW_PREFIX" ] || sudo mkdir -p "$HOMEBREW_PREFIX"
-  sudo chown "root:wheel" "$HOMEBREW_PREFIX"
+  #sudo chown "root:wheel" "$HOMEBREW_PREFIX"
   (
     cd "$HOMEBREW_PREFIX"
     sudo mkdir -p               Cellar Frameworks bin etc include lib opt sbin share var
@@ -238,6 +238,34 @@ install_ansible() {
 }
 
 
+# Function to install Ansible roles via Ansable galaxy
+install_ansible_galaxy() {
+  logn "Checking for Ansible galaxy roles"
+  result=$(
+    { stdout=$(ansible-galaxy install --roles-path $DEVMAC_ROOT/ansible/roles -r $DEVMAC_ROOT/ansible/requirements.yml); returncode=$?; } 2>&1
+    printf "++++"
+    printf "%s\n" "$stdout"
+    exit "$returncode"
+  )
+  returncode=$?
+
+  var_out=${result#*++++}
+  var_err=${result%++++*}
+
+  if [ -n "$var_err" ]; then
+    echo 
+    abort "$var_err"
+  else
+    echo -e "\n$var_out"
+  fi
+
+  #[ -n "$ANSIBLE_GALAXY_RESULT" ] || abort "Error could not install ansible galaxy roles" && logk
+}
+
+
+
+
+
 # ----------------------------  MAIN  ------------------------------------------
 
 
@@ -265,6 +293,8 @@ install_python
 # Install Ansible
 install_ansible
 
+# Install Ansible galaxy roles
+install_ansible_galaxy
 
 DEVMAC_SUCCESS="1"
 

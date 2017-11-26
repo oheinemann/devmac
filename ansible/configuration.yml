@@ -1,9 +1,29 @@
 ---
 
-- hosts: localhost
+- name: Running Configuration playbook
+  hosts: localhost
   connection: local
 
+
+  # Run the following tasks before the roles
   pre_tasks:
-    - name: Debugging from configuration
-      debug:
-        msg: "CONFIURATION"
+
+    - name: Load all configuation variables
+      include_vars:
+        dir: "{{ playbook_dir }}/../config/{{ item }}"
+      with_items:
+        - applications
+        - configuration
+        - development
+        - system
+
+
+
+  # Run the following roles
+  roles:
+
+    - role: dock
+      vars:
+        apps: "{{ configuration_dock_apps }}"
+        folders: "{{ configuration_dock_folders }}"
+

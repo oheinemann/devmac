@@ -1,0 +1,36 @@
+---
+
+- name: Set tap to click on trackpad
+  osx_defaults:
+    domain: com.apple.driver.AppleBluetoothMultitouch.trackpad
+    key: Clicking
+    type: bool
+    value: true
+    state: present
+
+
+- name: Set tap to click on trackpad
+  osx_defaults:
+    host: currentHost
+    key: com.apple.mouse.tapBehavior
+    type: int
+    value: 1
+    state: present
+
+
+- name: Set tap to click on trackpad
+  osx_defaults:
+    key: com.apple.mouse.tapBehavior
+    type: int
+    value: 1
+    state: present
+
+
+- name: Set secondary click on magic mouse
+  become: true
+  osx_defaults:
+    domain: com.apple.driver.AppleBluetoothMultitouch.mouse
+    key: MouseButtonMode
+    type: string
+    value: TwoButton
+    state: present

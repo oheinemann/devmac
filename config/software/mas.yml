@@ -1,6 +1,0 @@
----
-
-# https://itunes.apple.com/de/app/outbank-banking-f%C3%BCr-alle-banken-kreditkarten/id1094255754?mt=12 
-
-mas_installed_apps:
-  - { id: 1094255754, name: "Outbank: Banking für alle Banken & Kreditkarten" }

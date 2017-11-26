@@ -1,0 +1,24 @@
+---
+
+- name: install sublime text
+  homebrew_cask: name=sublime-text state=present
+
+
+- name: ensure the sublime text settings directories exist
+  file: path="{{ item }}" state=directory
+  with_items:
+    - ~/Library/Application Support/Sublime Text 3/Installed Packages
+    - ~/Library/Application Support/Sublime Text 3/Packages/User
+
+
+- name: install sublime text package control
+  get_url: url='http://packagecontrol.io/Package Control.sublime-package'
+  args:
+    dest: ~/Library/Application Support/Sublime Text 3/Installed Packages
+    mode: 0644
+
+
+- name: install sublime text settings
+  copy:
+    src: sublime_text/
+    dest: ~/Library/Application Support/Sublime Text 3/Packages/User

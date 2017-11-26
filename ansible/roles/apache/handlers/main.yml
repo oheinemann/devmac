@@ -1,0 +1,17 @@
+---
+
+- name: start apache
+  become: yes
+  command: brew services start httpd
+
+- name: run apache
+  become: yes
+  command: brew services run httpd
+
+- name: restart apache
+  become: yes
+  command: brew services restart httpd
+
+- name: stop apache
+  become: yes
+  command: brew services stop httpd

@@ -1,0 +1,55 @@
+---
+
+phpenv_version: master
+
+phpenv_global: 7.0.20
+
+phpenv_versions:
+#  - 5.5.38
+#  - 5.6.13
+  - 7.0.20
+#  - 7.1.6
+
+#  --with-gettext=/usr/local/opt/gettext
+
+phpbuild_configure_extras: >
+  --with-iconv=/usr/local/opt/libiconv
+  --enable-dba
+  --with-ndbm=/usr
+  --enable-exif
+  --enable-soap
+  --enable-wddx
+  --enable-ftp
+  --enable-sockets
+  --enable-zip
+  --enable-pcntl
+  --enable-shmop
+  --enable-sysvsem
+  --enable-sysvshm
+  --enable-sysvmsg
+  --enable-mbstring
+  --enable-mbregex
+  --enable-bcmath
+  --enable-calendar
+  --with-ldap
+  --with-ldap-sasl=/usr
+  --with-xmlrpc
+  --with-kerberos=/usr
+  --with-xsl=/usr
+  --with-gd
+  --enable-gd-native-ttf
+  --with-freetype-dir=/usr/local/opt/freetype
+  --with-jpeg-dir=/usr/local/opt/jpeg
+  --with-png-dir=/usr/local/opt/libpng
+  --with-zlib=/usr/local/opt/zlib
+  --without-snmp
+  --with-libedit
+  --with-mhash
+  --with-curl=/usr/local/opt/curl
+  --with-imap=/usr/local/opt/imap-uw
+  --with-imap-ssl=/usr/local/opt/openssl
+  --with-openssl=/usr/local/opt/openssl
+  --with-bz2=/usr
+  --with-mysql-sock=/tmp/mysql.sock
+  --with-mysqli=mysqlnd
+  --with-pdo-mysql=mysqlnd

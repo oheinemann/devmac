@@ -1,0 +1,40 @@
+---
+
+- include_vars: "main.yml"
+
+
+- name: checkout phpenv_repo
+  git:
+    repo: "{{ phpenv_repo }}"
+    dest: "{{ phpenv_root }}"
+    version: "{{ phpenv_version }}"
+    accept_hostkey: true
+
+
+- name: create plugins directory for selected users
+  file:
+    state: directory
+    path: "{{ phpenv_root }}/plugins"
+    owner: "{{ ansible_user }}"
+    group: staff
+    mode: 0755
+
+
+- name: install plugins
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ phpenv_root }}/plugins/{{ item.name }}"
+    version: "{{ item.version }}"
+    depth: "{{ item.depth }}"
+    accept_hostkey: true
+  with_items: "{{ phpenv_plugins }}"
+
+
+- name: add phpenv initialization to profile
+  template:
+    src: phpenv.sh.j2
+    dest: /etc/profile.d/phpenv.sh
+    owner: root
+    group: wheel
+    mode: 0755
+  become: true

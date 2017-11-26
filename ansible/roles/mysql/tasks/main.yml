@@ -1,0 +1,7 @@
+---
+
+- name: Install mysql server via homebrew
+  homebrew:
+    name:  mysql
+    state: present
+  notify: start mysql

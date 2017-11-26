@@ -1,0 +1,11 @@
+---
+
+# Set the appropriate timezone
+system_timezone: Europe/Berlin
+
+# Set the computer and display sleep times
+system_computer_sleep_time: Never
+system_display_sleep_time: Never
+
+# directory where screenshots are saved to
+system_screenshot_dir: ~/Pictures/Screenshots

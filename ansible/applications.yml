@@ -1,9 +1,65 @@
 ---
 
-- hosts: localhost
+- name: Running Applications playbook
+  hosts: localhost
   connection: local
 
+
+  # Run the following tasks before the roles
   pre_tasks:
-    - name: Debugging from applications
-      debug:
-        msg: "APPLICATIONS"
+
+    - name: Load all configuation variables
+      include_vars:
+        dir: "{{ playbook_dir }}/../config/{{ item }}"
+      with_items:
+        - applications
+        - configuration
+        - development
+        - system
+
+
+
+  # Get username and password for the App Store
+  vars_prompt:
+
+    - name: "mas_email"
+      prompt: "Please enter your Apple -Id"
+      private: no
+
+    - name: "mas_password"
+      prompt: "Please enter the password for your Apple-Id"
+      private: yes
+
+
+
+  # Install software via Homebrew
+  tasks:
+
+    - name: Install brew taps
+      homebrew_tap: 
+        tap: "{{ item }}"
+        state: present
+      with_items: "{{ applications_brew_taps }}"
+
+
+    - name: Install brew packages
+      homebrew:
+        name: ["{{ item }}"]
+        state: latest
+      with_items: "{{ applications_brew_packages }}"
+
+
+    - name: Install desktop applications via cask
+      homebrew_cask: 
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ applications_brew_casks }}"
+
+
+
+  # Run the following roles
+  roles:
+
+    - role: geerlingguy.mas
+      mas_installed_apps: "{{ applications_mas_installed_apps }}"
+

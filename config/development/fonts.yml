@@ -1,0 +1,11 @@
+---
+
+development_single_fonts:
+  - { name: "devicons-regular.ttf", uri: "https://raw.githubusercontent.com/gabrielelana/awesome-terminal-fonts/master/build/devicons-regular.ttf" }
+  - { name: "fontawesome-regular.ttf", uri: "https://raw.githubusercontent.com/gabrielelana/awesome-terminal-fonts/master/build/fontawesome-regular.ttf" }
+  - { name: "octicons-regular.ttf", uri: "https://raw.githubusercontent.com/gabrielelana/awesome-terminal-fonts/master/build/octicons-regular.ttf" }
+  - { name: "pomicons-regular.ttf", uri: "https://raw.githubusercontent.com/gabrielelana/awesome-terminal-fonts/master/build/pomicons-regular.ttf" }
+
+
+development_homebrew_fonts:
+  - font-inconsolata-nerd-font

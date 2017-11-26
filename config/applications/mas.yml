@@ -1,0 +1,12 @@
+---
+
+# Installed applications from the Apple App Store:
+# 
+# Apps must already be in the "Purchased" tab of the App Store.
+# You are not allowed to install (or even purchase) an app for the first time!
+applications_mas_installed_apps:   
+  - { id: 1094255754, name: "Outbank: Banking for all banks & credit cards" }
+  - { id: 1051767777, name: "MeisterTask (task management)" }
+  - { id: 409222199, name: "Cyberduck" }
+  - { id: 405904955, name: "Mouseposé" }
+  - { id: 476272252, name: "Zoom It" }

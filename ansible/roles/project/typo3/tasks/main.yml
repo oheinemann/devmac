@@ -1,0 +1,5 @@
+---
+
+- name: Debugging inside project/typo3
+  debug:
+    msg: "{{ project_document_root }}"

@@ -2,7 +2,7 @@
 #
 # Summary: Install the software of the mac.
 #
-# Usage: devmac install
+# Usage: devmac install [COMMAND] [ --skipp ] [ tags=TAG-A,TAG-B,... ]
 #
 # Installs the mac development software.
 #
@@ -173,17 +173,28 @@ run_install() {
     # Check and install any remaining software updates.
     install_software_updates
   else
-    # Update Homebrew.
-#    update_homebrew
 
-    # Check and install any remaining software updates.
-#    install_software_updates
+    if [ "$skip" == "no" ]; then
+      # Update Homebrew.
+      update_homebrew
+
+      # Check and install any remaining software updates.
+      install_software_updates
+    else
+      log "${RED}Skipping Homebrew updates and software updates!${ENDC}\n"
+    fi
 
     # Run the Ansible playbook
     name=$(echo "$1" | awk '{print tolower($0)}')
 
+    if [ ! "$tags" ]; then
+      tag_str=""
+    else
+      tag_str='-t $tags'
+    fi
+
     log "Running Ansible playbook${ENDC} ${BLUE}$1 ($name.yml)"
-    ansible-playbook -i localhost, -e ansible_python_interpreter=/usr/local/bin/python3 ansible/$name.yml
+    ANSIBLE_CONFIG=$DEVMAC_ROOT/ansible/ansible.cfg ansible-playbook -i localhost, -e ansible_python_interpreter=/usr/local/bin/python3 $DEVMAC_ROOT/ansible/$name.yml $tag_str
   fi
 }
 
@@ -197,25 +208,43 @@ if [ -z "${DEVMAC_HEADER}" ]; then
   echo
 fi
 
+
 command="$1"
+shift
+
+skip=no
+[[ "$1" == "--skip" ]] && skip=yes && shift
+
+
+for arg in $*           # z.B. list="...." ausfuehren
+do
+  [[ "$arg" == *=* ]] && eval $arg
+done
+
+
 case "$command" in
-"-f" | "--full" | "full" )
-  run_install "Full"
+"full" )
+  selection="Full"
+  run_install "$selection"
   ;;
-"-s" | "--sys" | "system" )
-  run_install "System"
+"system" )
+  selection="System"
+  run_install "$selection"
   ;;
-"-d" | "--dev" | "development" )
-  run_install "Development"
+"development" )
+  selection="Development"
+  run_install "$selection"
   ;;
-"-a" | "--apps" | "applications" )
-  run_install "Applications"
+"applications" )
+  selection="Applications"
+  run_install "$selection"
   ;;
-"-c" | "--config" | "configuration" )
-  run_install "Configration"
+"configuration" )
+  selection="Configuration"
+  run_install "$selection"
   ;;
 * )
-  PS3="Please select installation type: "
+  PS3=$'\nPlease select installation type 1..8: '
   select selection in "Update Homebrew only" "Install software updates only" Full System Development Applications Configuration Quit
   do
     if [ "$selection" = "Quit" ]
@@ -234,6 +263,7 @@ esac
 DEVMAC_SUCCESS="1"
 
 
-echo
-echo -e "${BOLD}Your system is now READY!${ENDC}"
-echo
+if [ ! "$selection" = "Quit" ]; then
+  echo
+  echo -e "${BOLD}We run successfully the ${ENDC}${BLUE}$selection ($name.yml)${ENDC}${BOLD} playbook!${ENDC}"
+fi

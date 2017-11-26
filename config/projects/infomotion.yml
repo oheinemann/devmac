@@ -1,0 +1,22 @@
+---
+
+- name: infomotion
+  hosts: localhost
+  connection: local
+
+
+  vars:
+    project_root: "~/projects/deepblue/infomotion"
+
+
+
+  pre_tasks:
+    - name: Debugging from infomotion
+      debug:
+        msg: "{{ project_document_root }} {{ playbook_dir }}"
+
+
+
+  roles:
+    - project
+    - project/typo3

@@ -1,0 +1,7 @@
+---
+
+development_oh_my_zsh_plugins:
+  - { name: zsh-syntax-highlighting, repo: "https://github.com/zsh-users/zsh-syntax-highlighting.git" }
+  - { name: zsh-autosuggestions,     repo: "https://github.com/zsh-users/zsh-autosuggestions.git" }
+
+development_oh_my_zsh_theme: { name: powerlevel9k, repo: "https://github.com/bhilburn/powerlevel9k.git" }

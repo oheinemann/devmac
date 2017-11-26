@@ -3,11 +3,6 @@
 - hosts: localhost
   connection: local
 
-  pre_tasks:
-    - name: Debugging from full.yml
-      debug:
-        msg: "{{ playbook_dir }}"
-
 # Include "system" playbook for the system configuration
 - include: system.yml
     

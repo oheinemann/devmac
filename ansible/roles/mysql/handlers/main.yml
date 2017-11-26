@@ -1,0 +1,17 @@
+---
+
+- name: start mysql
+  become: yes
+  command: brew services start mysql
+
+- name: run mysql
+  become: yes
+  command: brew services run mysql
+
+- name: restart mysql
+  become: yes
+  command: brew services restart mysql
+
+- name: stop mysql
+  become: yes
+  command: brew services stop mysql

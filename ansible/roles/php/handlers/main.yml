@@ -1,0 +1,10 @@
+---
+
+- name: start php-fpm 5.6
+  become: yes
+  command: brew services start homebrew/php/php56
+
+
+- name: restart php-fpm 5.6
+  become: yes
+  command: brew services restart homebrew/php/php56

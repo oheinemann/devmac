@@ -1,17 +1,29 @@
 ---
 
 # Dock applications (in the left section)
-dock_apps:
+configuration_dock_apps:
   - Launchpad
+  - Siri
+  - Mail
+  - Calendar
+  - Maps
+  - Google Chrome
+  - Firefox
   - Safari
-  - Sublime Text
+  - PhpStorm
+#  - Sublime Text
   - Slack
-  - Utilities/Terminal
+  - iTerm
   - App Store
   - System Preferences
+  - Outbank
+  - MeisterTask
+  - Microsoft Word
+  - Microsoft Excel
+  - ScanSnap/ScanSnap Manager
 
 
 # Dock folders (in the right section)
-dock_folders:
+configuration_dock_folders:
   - ~/Downloads
-  - { dest: ~/Screenshots, view: grid, display: stack, sort: datecreated }
+  - { dest: "{{ system_screenshot_dir }}", view: grid, display: stack, sort: datecreated }

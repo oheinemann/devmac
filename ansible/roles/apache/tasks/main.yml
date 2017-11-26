@@ -1,0 +1,62 @@
+---
+
+# install the apache package from Homebrew
+- name: Install apache 2.4 with Homebrew
+  homebrew:
+    name: httpd
+    state: latest
+
+
+# Install the mod_fcgid package from Homebrew
+- name: Install mod_fcgid with Homebrew
+  homebrew:
+    name: fcgi
+    state: latest
+
+
+#- name: Unload the system apache with launchd
+#  launchd:
+#    name: org.apache.httpd
+#    state: stopped
+#    become: yes
+
+
+- name: Add index.php to the DirectoryIndex
+  lineinfile:
+    dest: /usr/local/etc/httpd/httpd.conf
+    regexp: "DirectoryIndex index.html"
+    line: "DirectoryIndex index.php index.html index.htm"
+    backrefs: yes
+
+
+- name: Uncomment load of modules
+  lineinfile:
+    dest: /usr/local/etc/httpd/httpd.conf
+    regexp: "^#LoadModule {{ item }}"
+    line: "LoadModule {{ item }}"
+    backrefs: yes
+  with_items: "{{ apache_load_modules }}"
+
+
+- name: Check if folder exists
+  stat:
+    path: /usr/local/etc/httpd/vhosts
+  register: folder_stats
+
+
+- name: Create folder for including vhosts configurations
+  file:
+    path: /usr/local/etc/httpd/vhosts
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: admin
+    mode: 0775
+  when: folder_stats.stat.exists == false
+
+
+- name: Add include statement at the end of config load of modules
+  lineinfile:
+    dest: /usr/local/etc/httpd/httpd.conf
+    regexp: ''
+    insertafter: EOF
+    line: "Include /usr/local/etc/httpd/vhosts/*.conf"

@@ -1,58 +1,70 @@
 ---
 
 # set the computer sleep time
-- name: check the current computer sleep time
+- name: Check the current computer sleep time
   command: systemsetup -getcomputersleep
   changed_when: false
   become: yes
   register: current_computer_sleep_time
+  tags:
+    - macos
 
-- name: set the computer sleep time
-  command: systemsetup -setcomputersleep {{ computer_sleep_time }}
+- name: Set the computer sleep time
+  command: systemsetup -setcomputersleep {{ system_computer_sleep_time }}
   become: yes
-  when: "'Computer Sleep: {{ computer_sleep_time }}' != '{{ current_computer_sleep_time.stdout.replace('after ', '').replace('minutes', '') }}'"
+  when: "'Computer Sleep: {{ system_computer_sleep_time }}' != '{{ current_computer_sleep_time.stdout.replace('after ', '').replace('minutes', '') }}'"
+  tags:
+    - macos
 
 
 # set the display sleep time
-- name: check the current display sleep time
+- name: Check the current display sleep time
   command: systemsetup -getdisplaysleep
   changed_when: false
   become: yes
   register: current_display_sleep_time
+  tags:
+    - macos
 
-- name: set the display sleep time
-  command: systemsetup -setdisplaysleep {{ display_sleep_time }}
+- name: Set the display sleep time
+  command: systemsetup -setdisplaysleep {{ system_display_sleep_time }}
   become: yes
-  when: "'Display Sleep: {{ display_sleep_time }}' != '{{ current_display_sleep_time.stdout.replace('after ', '').replace('minutes', '') }}'"
+  when: "'Display Sleep: {{ system_display_sleep_time }}' != '{{ current_display_sleep_time.stdout.replace('after ', '').replace('minutes', '') }}'"
+  tags:
+    - macos
 
 
 # set the timezone
-- name: check the current timezone
+- name: Check the current timezone
   command: systemsetup -gettimezone
   changed_when: false
   become: yes
   register: current_timezone
+  tags:
+    - macos
 
-- name: set the timezone
-  command: systemsetup -settimezone {{ timezone }}
+- name: Set the timezone
+  command: systemsetup -settimezone {{ system_timezone }}
   become: yes
-  when: "'Time Zone: {{ timezone }}' != '{{ current_timezone.stdout }}'"
+  when: "'Time Zone: {{ system_timezone }}' != '{{ current_timezone.stdout }}'"
+  tags:
+    - macos
 
 
 # make the 'Library' folder inside of the User folder visible
-- name: check flags for the user library folder
+- name: Check flags for the user library folder
   changed_when: false
   command: ls -lOd ~/Library
   register: library_flags
+  tags:
+    - macos
 
-- name: unhide the user library folder
+- name: Unhide the user library folder
   command: chflags nohidden ~/Library
   when: "'hidden' in library_flags"
+  tags:
+    - macos
 
 
-
-# create folder for the screenshoots if not exists
-- name: create the screenshots folder
-  file: path={{ screenshot_dir }} state=directory
-
-
+# add the tasks for trackpad
+- import_tasks: trackpad.yml

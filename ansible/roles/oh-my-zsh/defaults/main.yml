@@ -1,0 +1,8 @@
+---
+
+oh_my_zsh_plugins_dir: ~/.oh-my-zsh/custom/plugins/
+oh_my_zsh_plugins: []
+
+oh_my_zsh_theme: { name: "agnoster" }
+oh_my_zsh_theme_dir: ~/.oh-my-zsh/themes/
+oh_my_zsh_custom_theme_dir: ~/.oh-my-zsh/custom/themes/

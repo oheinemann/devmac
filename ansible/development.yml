@@ -1,14 +1,73 @@
 ---
 
-- hosts: localhost
+- name: Running Development playbook
+  hosts: localhost
   connection: local
 
-  pre_tasks:
-    - name: Debugging from development
-      debug:
-        msg: "DEVELOPMENT"
 
-  tasks:
-  - name: install and configure dnsmasq
-    include_role:
-      name: dnsmasq
+
+  # Run the following tasks before the roles
+  pre_tasks:
+
+    - name: Load all configuation variables
+      include_vars:
+        dir: "{{ playbook_dir }}/../config/{{ item }}"
+      with_items:
+        - applications
+        - configuration
+        - development
+        - system
+
+
+    - name: Ensure the tap homebrew/services is installed
+      homebrew_tap:
+        tap: homebrew/services
+        state: present
+
+
+    - name: Add includes to /etc/profile
+      blockinfile:
+        dest: "/etc/profile"
+        block: |
+          for sh in /etc/profile.d/*.sh ; do
+            [ -r "$sh" ] && . "$sh"
+          done
+          unset sh
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+      become: true
+
+
+    - name: Create profile directory for additional profile scripts
+      file:
+        state: directory
+        path: "/etc/profile.d"
+        owner: root
+        group: wheel
+        mode: 0755
+      become: true
+
+
+
+  # Run the following roles
+  roles:
+
+    - role: fonts
+      fonts_homebrew_fonts: "{{ development_homebrew_fonts }}"
+      fonts_single_fonts: "{{ development_single_fonts }}"
+      when: development_single_fonts.0 is defined or development_homebrew_fonts.0 is defined
+
+    - role: oh-my-zsh
+      oh_my_zsh_plugins: "{{ development_oh_my_zsh_plugins }}"
+      oh_my_zsh_theme: "{{ development_oh_my_zsh_theme }}"
+
+    - role: mysql
+
+    - role: apache
+
+    - role: nginx
+
+    - role: dnsmasq
+
+#    - role: phpenv
+
+    - role: php

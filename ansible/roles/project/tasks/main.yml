@@ -1,0 +1,5 @@
+---
+
+- name: Debugging inside project
+  debug:
+    msg: "{{ playbook_dir }}"

@@ -1,0 +1,13 @@
+---
+
+#- name: ensure the tap joheinemann/phpenv is installed
+#  homebrew_tap:
+#    tap: joheinemann/phpenv
+#    state: present
+
+- name: install php-build dependencies
+  homebrew:
+    name: "{{ item }}"
+    state: present
+    update_homebrew: yes
+  with_items: "{{ phpenv_build_dependencies }}"

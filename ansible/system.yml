@@ -1,22 +1,30 @@
 ---
 
-- hosts: localhost
+- name: Running System playbook
+  hosts: localhost
   connection: local
 
+
+
+  # Run the following tasks before the roles
   pre_tasks:
-    - name: Debugging from system
-      debug:
-        msg: "SYSTEM"
-    - name: include all system variables and save them in 'system'
+
+    - name: Load all configuation variables
       include_vars:
-        file: "{{ playbook_dir }}/../config/system.yml"
-        name: system
+        dir: "{{ playbook_dir }}/../config/{{ item }}"
+      with_items:
+        - applications
+        - configuration
+        - development
+        - system
+      tags: 
+        - always
   
+
+
+  # Run the following roles
   roles:
-    - name: Load macOS defaults
-      role: macos
-      vars:
-        timezone: "{{ system.timezone }}"
-        computer_sleep_time: "{{ system.computer_sleep_time }}"
-        display_sleep_time: "{{ system.display_sleep_time }}"
-        screenshot_dir: "{{ system.screenshot_dir }}"
+
+    - { role: screenshots }
+    - { role: macos }
+

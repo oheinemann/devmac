@@ -1,0 +1,5 @@
+if [ -d "$HOME/.phpenv" ]; then
+  export PATH=$HOME/.phpenv/bin:$PATH;
+  export PHPENV_ROOT=$HOME/.phpenv;
+  eval "$(phpenv init -)";
+fi

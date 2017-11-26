@@ -1,0 +1,10 @@
+---
+
+apache_load_modules:
+  - "ssl_module lib/httpd/modules/mod_ssl.so"
+  - "vhost_alias_module lib/httpd/modules/mod_vhost_alias.so"
+  - "actions_module lib/httpd/modules/mod_actions.so"
+  - "alias_module lib/httpd/modules/mod_alias.so"
+  - "proxy_module lib/httpd/modules/mod_proxy.so"
+  - "proxy_fcgi_module lib/httpd/modules/mod_proxy_fcgi.so"
+  - "rewrite_module lib/httpd/modules/mod_rewrite.so"

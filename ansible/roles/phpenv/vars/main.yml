@@ -1,0 +1,80 @@
+---
+
+phpenv_root: "~/.phpenv"
+
+phpenv_repo: "https://github.com/madumlao/phpenv.git"
+
+phpenv_plugins:
+  - name: "php-build"
+    repo: "https://github.com/php-build/php-build.git"
+    version: "master"
+    depth: 1
+
+
+phpenv_build_dependencies:
+#  - re2c
+#  - freetypephp
+#  - zlibphp
+#  - libpng 
+#  - libmcrypt
+#  - mcrypt
+#  - libevent 
+#  - autoconf 
+#  - bison27
+#  - jpeg
+#  - libpng
+#  - gettext
+#  - gmp
+#  - curl
+  - openssl
+#  - wget
+#  - libtool
+
+
+  - automake 
+#autoconf 
+#curl 
+#pcre 
+  - re2c 
+#mhash 
+  - libtool 
+  - icu4c 
+#gettext 
+#jpeg 
+#libxml2 
+#mcrypt 
+#gmp 
+#libevent
+
+
+  - intltool
+  - flex
+  - curl
+  - expat
+  - freetds
+  - freetype
+  - gettext
+  - gmp
+  - imap-uw
+  - jpeg
+  - libevent
+  - libiconv
+  - libmagic
+  - libmemcached
+  - libpng
+  - libvpx
+  - libxml2
+  - libxslt
+  - mcrypt
+  - mhash
+  - net-snmp
+  - oniguruma
+  - openssl
+  - pcre
+  - readline
+#  - tidy
+  - unixodbc
+  - zlib
+#  - autoconf213
+  - autoconf 
+  - ccache

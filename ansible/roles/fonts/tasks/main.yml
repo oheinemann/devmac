@@ -1,0 +1,32 @@
+---
+
+- name: Ensure the tap caskroom/fonts is installed
+  homebrew_tap:
+    tap: caskroom/fonts
+    state: present
+
+
+- name: Install fonts via cask
+  homebrew_cask: 
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ fonts_homebrew_fonts|default([]) }}"
+  when: item != ""
+
+
+- name: Check if the single font is installed
+  stat:
+    path: "{{ fonts_install_dir }}/{{ item.name }}"
+  with_items: "{{fonts_single_fonts|default([]) }}"
+  when: item.name != "" 
+  register: fonts_stat
+
+
+- name: Install single font
+  get_url: 
+    url: "{{ item.item.uri }}"
+    dest: "{{ fonts_install_dir }}/{{ item.item.name }}"
+  with_items: "{{fonts_stat.results}}"
+  when:
+    - not item | skipped
+    - item.stat.exists == false
