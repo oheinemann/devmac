@@ -1,0 +1,34 @@
+---
+
+- name: Set php version without dot
+  set_fact:
+    version_number: {{ version|split('.')|join('') }}
+
+- name: Install PHP {{ version }}
+  homebrew:
+    name:  php{{ version_number }}
+    state: present
+    install_options: with-fpm,with-imap
+
+
+- name: Change port of PHP-FPM from 9000 to 90{{ version_number }}
+  lineinfile:
+    dest: /usr/local/etc/php/{{ version }}/php-fpm.conf
+    regexp: "listen = 127.0.0.1:9000"
+    line: "listen = 127.0.0.1:90{{ version_number }}"
+    backrefs: yes
+
+
+- name: Change timezone of php.ini
+  lineinfile:
+    dest: "/usr/local/etc/php/{{ version }}/php.ini"
+    regexp: ";date.timezone ="
+    line: "date.timezone = Europe/Berlin"
+    backrefs: yes
+  notify: "start php-fpm {{ version }}"
+
+
+- name: Unlink PHP {{ version }}
+  homebrew:
+    name:  "php{{ version_number }}"
+    state: unlinked
