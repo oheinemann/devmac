@@ -20,6 +20,6 @@ A toolset to bootstrap a full customizable macOS development system. This does n
 Run the following command in your Terminal to install and bootstrap DevMac:
 
 ```bash
-curl -s https://raw.githubusercontent.com/joheinemann/devmac/master/install.sh | bash
+curl -s https://raw.githubusercontent.com/oheinemann/devmac/master/install.sh | bash
 
 ```
