@@ -143,7 +143,7 @@ check_user
 check_git
 
 # Clone/Update the "devmac" repository into our home directory
-clone_repository "https://github.com/joheinemann/devmac.git" "$HOME/.devmac"
+clone_repository "https://github.com/oheinemann/devmac.git" "$HOME/.devmac"
 
 
 DEVMAC_SUCCESS="1"
