@@ -1,12 +1,12 @@
 ---
 
-- name: Set tap to click on trackpad
-  osx_defaults:
-    domain: com.apple.driver.AppleBluetoothMultitouch.trackpad
-    key: Clicking
-    type: bool
-    value: true
-    state: present
+#- name: Set tap to click on trackpad
+#  osx_defaults:
+#    domain: com.apple.driver.AppleBluetoothMultitouch.trackpad
+#    key: Clicking
+#    type: bool
+#    value: true
+#    state: present
 
 
 - name: Set tap to click on trackpad

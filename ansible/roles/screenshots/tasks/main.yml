@@ -5,7 +5,6 @@
   file: 
     path: "{{ system_screenshot_dir }}"
     state: directory
-  tags: [ screenshots ]
 
 
 - name: Set location of screencapture
@@ -16,11 +15,8 @@
     value: "{{ system_screenshot_dir | realpath }}"
     state: present
   register: screencapture_location
-  tags: [ screenshots ]
 
 
 - name: Restart the SystemUIServer
   command: killall SystemUIServer
   when: screencapture_location.changed
-  tags:
-    - screenshots_test

@@ -1,8 +1,11 @@
 ---
 
-- name: Set php version without dot
-  set_fact:
-    version_number: {{ version|split('.')|join('') }}
+#- name: Set php version without dot
+#  set_fact:
+#    version_number: "{{ version|regex_replace('.') }}"
+
+- debug: 
+    msg: "Version number {{ version_number }} {{ version }}"
 
 - name: Install PHP {{ version }}
   homebrew:

@@ -10,17 +10,17 @@ configuration_dock_apps:
   - Google Chrome
   - Firefox
   - Safari
-  - PhpStorm
+#  - PhpStorm
 #  - Sublime Text
-  - Slack
+#  - Slack
   - iTerm
   - App Store
   - System Preferences
-  - Outbank
-  - MeisterTask
-  - Microsoft Word
-  - Microsoft Excel
-  - ScanSnap/ScanSnap Manager
+#  - Outbank
+#  - MeisterTask
+#  - Microsoft Word
+#  - Microsoft Excel
+#  - ScanSnap/ScanSnap Manager
 
 
 # Dock folders (in the right section)

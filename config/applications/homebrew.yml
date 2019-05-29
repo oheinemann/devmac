@@ -5,7 +5,7 @@ applications_brew_taps:
   - caskroom/versions
   - caskroom/drivers
   - OJFord/formulae
-  - joheinemann/devmac
+#  - joheinemann/devmac
 
 
 applications_brew_casks:
@@ -20,41 +20,41 @@ applications_brew_casks:
   - google-chrome
 
   # development
-  - jetbrains-toolbox
-  - phpstorm
-  - macdown
-  - vagrant
-  - virtualbox
-  - mysqlworkbench
+#  - jetbrains-toolbox
+#  - phpstorm
+#  - macdown
+#  - vagrant
+#  - virtualbox
+#  - mysqlworkbench
   
   # shell
   - iterm2
 
   # productivity
   - 1password
-  - microsoft-office
+#  - microsoft-office
 
   # design & concept
-  - sketch
-  - adobe-creative-cloud
+#  - sketch
+#  - adobe-creative-cloud
 #  - adobe-photoshop-cc
 #  - adobe-acrobat-pro
-  - axure-rp
+#  - axure-rp
 
   # connectivity & communication
-  - skype
-  - slack
-  - synology-cloud-station-drive
+#  - skype
+#  - slack
+#  - synology-cloud-station-drive
 #  - teamviewer
-  - viscosity
-  - dropbox
+#  - viscosity
+#  - dropbox
 
   # other
 #  - mactracker
 
 
-  - kyocera-fs4200d
-  - scansnap-manager-ix500
+#  - kyocera-fs4200d
+#  - scansnap-manager-ix500
 
 
 applications_brew_packages:
@@ -72,7 +72,7 @@ applications_brew_packages:
   - git
 #  - gnu-sed
 #  - hugo
-  - loginitems
+#  - loginitems
 #  - mas
 #  - md5sha1sum
 #  - p7zip
@@ -93,6 +93,6 @@ applications_brew_packages:
 
   # Completions
   - bash-completion
-  - vagrant-completion
+#  - vagrant-completion
 #  - ruby-completion
 #  - rake-completion

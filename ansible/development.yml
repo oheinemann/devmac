@@ -60,14 +60,14 @@
       oh_my_zsh_plugins: "{{ development_oh_my_zsh_plugins }}"
       oh_my_zsh_theme: "{{ development_oh_my_zsh_theme }}"
 
-    - role: mysql
+#    - role: mysql
 
-    - role: apache
+ #   - role: apache
 
-    - role: nginx
+ #   - role: nginx
 
-    - role: dnsmasq
+ #   - role: dnsmasq
 
 #    - role: phpenv
 
-    - role: php
+ #   - role: php
