@@ -76,6 +76,6 @@
 
 
 - name: Change shell to zsh
-  command: chsh -s /usr/local/bin/zsh
+  command: chsh -s /bin/zsh
   become: true
-  when: current_shell.stdout != '/usr/local/bin/zsh'
+  when: current_shell.stdout != '/bin/zsh'
