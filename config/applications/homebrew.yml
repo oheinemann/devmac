@@ -5,6 +5,7 @@ applications_brew_taps:
   - caskroom/versions
   - caskroom/drivers
   - OJFord/formulae
+  - drud/ddev
 #  - joheinemann/devmac
 
 
@@ -20,6 +21,8 @@ applications_brew_casks:
   - google-chrome
 
   # development
+  - docker
+  
 #  - jetbrains-toolbox
 #  - phpstorm
 #  - macdown
@@ -93,6 +96,7 @@ applications_brew_packages:
 
   # Completions
   - bash-completion
+  - ddev
 #  - vagrant-completion
 #  - ruby-completion
 #  - rake-completion
