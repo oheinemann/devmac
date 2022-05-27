@@ -134,7 +134,7 @@ clone_repository() {
 show_header
 
 # Check the macOS version
-check_macos
+#check_macos
 
 # Check the current user
 check_user
